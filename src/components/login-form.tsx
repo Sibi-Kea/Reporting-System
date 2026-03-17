@@ -12,24 +12,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type AccessView = "staff" | "admin";
 
-const adminDemoAccounts = [
-  {
-    label: "Super Admin",
-    companySlug: "sm-techie",
-    email: "superadmin@smtechie.com",
-  },
-  {
-    label: "Manager",
-    companySlug: "sm-techie",
-    email: "manager.it@smtechie.com",
-  },
-  {
-    label: "Growth Manager",
-    companySlug: "acme-logistics",
-    email: "manager.ops@acmelogistics.com",
-  },
-];
-
 export function LoginForm({
   notice,
   companySlug,
@@ -45,15 +27,14 @@ export function LoginForm({
 }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<AccessView>(defaultView);
-  const [email, setEmail] = useState("superadmin@smtechie.com");
-  const [password, setPassword] = useState("Password123!");
-  const [staffCode, setStaffCode] = useState("1001");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [staffCode, setStaffCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
 
   const normalizedCompanySlug = companySlug.trim().toLowerCase();
   const quickClockHref = normalizedCompanySlug ? `/quick-clock?company=${encodeURIComponent(normalizedCompanySlug)}` : "/quick-clock";
-  const visibleAdminDemoAccounts = adminDemoAccounts.filter((account) => account.companySlug === normalizedCompanySlug);
 
   async function handleAdminSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -181,67 +162,41 @@ export function LoginForm({
           </TabsContent>
 
           <TabsContent className="mt-5" value="admin">
-            <div className="space-y-5">
-              <form className="space-y-4 rounded-[28px] border border-border bg-slate-50/80 p-5 dark:bg-slate-900/60" onSubmit={handleAdminSubmit}>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    className="h-12 rounded-2xl"
-                    id="email"
-                    onChange={(event) => {
-                      setEmail(event.target.value);
-                      setError(null);
-                    }}
-                    type="email"
-                    value={email}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    className="h-12 rounded-2xl"
-                    id="password"
-                    onChange={(event) => {
-                      setPassword(event.target.value);
-                      setError(null);
-                    }}
-                    type="password"
-                    value={password}
-                  />
-                </div>
-                {error ? <p className="text-sm text-destructive">{error}</p> : null}
-                <Button className="w-full rounded-2xl" disabled={isPending} size="lg" type="submit">
-                  {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                  Sign in
-                </Button>
-              </form>
-
-              {visibleAdminDemoAccounts.length ? (
-                <div className="rounded-[28px] border border-border bg-slate-50/80 p-5 dark:bg-slate-900/60">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-sm font-medium">Demo admin access</p>
-                    <p className="text-xs text-muted-foreground">Password: Password123!</p>
-                  </div>
-                  <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                    {visibleAdminDemoAccounts.map((account) => (
-                      <button
-                        key={`${account.companySlug}-${account.email}`}
-                        className="rounded-2xl border border-transparent bg-background px-4 py-3 text-left transition hover:border-border"
-                        onClick={() => {
-                          setEmail(account.email);
-                          setPassword("Password123!");
-                          setError(null);
-                        }}
-                        type="button"
-                      >
-                        <span className="font-medium text-foreground">{account.label}</span>
-                        <span className="mt-1 block text-xs text-muted-foreground">{account.email}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-            </div>
+            <form className="space-y-4 rounded-[28px] border border-border bg-slate-50/80 p-5 dark:bg-slate-900/60" onSubmit={handleAdminSubmit}>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  className="h-12 rounded-2xl"
+                  id="email"
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    setError(null);
+                  }}
+                  placeholder="name@company.com"
+                  type="email"
+                  value={email}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  className="h-12 rounded-2xl"
+                  id="password"
+                  onChange={(event) => {
+                    setPassword(event.target.value);
+                    setError(null);
+                  }}
+                  placeholder="Enter your password"
+                  type="password"
+                  value={password}
+                />
+              </div>
+              {error ? <p className="text-sm text-destructive">{error}</p> : null}
+              <Button className="w-full rounded-2xl" disabled={isPending} size="lg" type="submit">
+                {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                Sign in
+              </Button>
+            </form>
           </TabsContent>
         </Tabs>
       </CardContent>

@@ -10,28 +10,13 @@
 
  ✓ Starting...
  ○ (pwa) PWA support is disabled.
- ✓ Ready in 8.3s
+ ✓ Ready in 7.9s
  ○ Compiling /api/auth/[...nextauth] ...
- ✓ Compiled /api/auth/[...nextauth] in 2.4s (353 modules)
- GET /api/auth/error 200 in 5077ms
- ○ Compiling /favicon.ico ...
- ✓ Compiled /favicon.ico in 1950ms (383 modules)
- GET /favicon.ico 200 in 2497ms
+ ✓ Compiled /api/auth/[...nextauth] in 1334ms (353 modules)
+ GET /api/auth/csrf 200 in 3830ms
+ POST /api/auth/callback/workspace-credentials 200 in 4173ms
  ○ Compiling /login ...
- ✓ Compiled /login in 4.6s (1261 modules)
- ✓ Compiled in 1250ms (436 modules)
- GET /login 200 in 8572ms
-prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
- GET /api/auth/error 200 in 190ms
- GET /favicon.ico 200 in 72ms
- ○ Compiling / ...
- ✓ Compiled / in 3.1s (1071 modules)
- GET / 307 in 6043ms
- ○ Compiling /login ...
- ✓ Compiled /login in 702ms (828 modules)
- GET /login 200 in 5869ms
- ○ Compiling /manifest.webmanifest ...
- ✓ Compiled /manifest.webmanifest in 552ms (833 modules)
- GET /manifest.webmanifest 200 in 1365ms
- GET /api/auth/session 200 in 69ms
- GET /api/auth/session 200 in 19ms
+ ✓ Compiled /login in 4.1s (1231 modules)
+ ✓ Compiled in 1372ms (436 modules)
+ GET /login 200 in 6245ms
+ ✓ Compiled in 900ms (436 modules)
