@@ -170,85 +170,165 @@ export function CompanyManagement({
           <CardTitle>Company management</CardTitle>
           <CardDescription>Create, edit, suspend, and retire tenant companies from the super-admin workspace.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Company</TableHead>
-                <TableHead>Slug</TableHead>
-                <TableHead>Plan</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Timezone</TableHead>
-                <TableHead>Usage</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {companies.map((company) => (
-                <TableRow key={company.id}>
-                  <TableCell>
-                    <div className="space-y-3">
-                      <Input value={drafts[company.id]?.name ?? company.name} onChange={(event) => updateDraft(company.id, "name", event.target.value)} />
-                      <LogoUploadField companyId={company.id} label="Tenant logo" onChange={(value) => updateDraft(company.id, "logoUrl", value)} value={drafts[company.id]?.logoUrl ?? ""} />
-                    </div>
-                  </TableCell>
-                  <TableCell>
+        <CardContent className="space-y-4">
+          <div className="space-y-4 md:hidden">
+            {companies.map((company) => (
+              <div className="rounded-[28px] border border-border bg-secondary/20 p-4" key={company.id}>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Company name</Label>
+                    <Input value={drafts[company.id]?.name ?? company.name} onChange={(event) => updateDraft(company.id, "name", event.target.value)} />
+                  </div>
+                  <LogoUploadField companyId={company.id} label="Tenant logo" onChange={(value) => updateDraft(company.id, "logoUrl", value)} value={drafts[company.id]?.logoUrl ?? ""} />
+                  <div className="space-y-2">
+                    <Label>Slug</Label>
                     <Input value={drafts[company.id]?.slug ?? company.slug} onChange={(event) => updateDraft(company.id, "slug", event.target.value)} />
-                  </TableCell>
-                  <TableCell>
-                    <Select
-                      onValueChange={(value) => updateDraft(company.id, "subscriptionPlan", value as SubscriptionPlan)}
-                      value={drafts[company.id]?.subscriptionPlan ?? company.subscriptionPlan}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Plan" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(planLabels).map(([value, label]) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    <Select onValueChange={(value) => updateDraft(company.id, "status", value as CompanyStatus)} value={drafts[company.id]?.status ?? company.status}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(statusLabels).map(([value, label]) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>Plan</Label>
+                      <Select
+                        onValueChange={(value) => updateDraft(company.id, "subscriptionPlan", value as SubscriptionPlan)}
+                        value={drafts[company.id]?.subscriptionPlan ?? company.subscriptionPlan}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Plan" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(planLabels).map(([value, label]) => (
+                            <SelectItem key={value} value={value}>
+                              {label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Status</Label>
+                      <Select onValueChange={(value) => updateDraft(company.id, "status", value as CompanyStatus)} value={drafts[company.id]?.status ?? company.status}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(statusLabels).map(([value, label]) => (
+                            <SelectItem key={value} value={value}>
+                              {label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Timezone</Label>
                     <Input
                       value={drafts[company.id]?.timezone ?? company.timezone}
                       onChange={(event) => updateDraft(company.id, "timezone", event.target.value)}
                     />
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
+                  </div>
+                  <div className="rounded-2xl border border-border bg-background px-4 py-3 text-sm text-muted-foreground">
                     {company._count.users} users / {company._count.departments} departments / {company._count.officeLocations} locations
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex justify-end gap-2">
-                      <Button disabled={isPending} onClick={() => void saveCompany(company.id)} type="button" variant="outline">
-                        Save
-                      </Button>
-                      <Button disabled={isPending} onClick={() => void removeCompany(company.id)} size="icon" type="button" variant="destructive">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+                  </div>
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <Button className="w-full sm:flex-1" disabled={isPending} onClick={() => void saveCompany(company.id)} type="button" variant="outline">
+                      Save company
+                    </Button>
+                    <Button className="w-full sm:w-auto" disabled={isPending} onClick={() => void removeCompany(company.id)} type="button" variant="destructive">
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Company</TableHead>
+                  <TableHead>Slug</TableHead>
+                  <TableHead>Plan</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Timezone</TableHead>
+                  <TableHead>Usage</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {companies.map((company) => (
+                  <TableRow key={company.id}>
+                    <TableCell>
+                      <div className="space-y-3">
+                        <Input value={drafts[company.id]?.name ?? company.name} onChange={(event) => updateDraft(company.id, "name", event.target.value)} />
+                        <LogoUploadField companyId={company.id} label="Tenant logo" onChange={(value) => updateDraft(company.id, "logoUrl", value)} value={drafts[company.id]?.logoUrl ?? ""} />
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Input value={drafts[company.id]?.slug ?? company.slug} onChange={(event) => updateDraft(company.id, "slug", event.target.value)} />
+                    </TableCell>
+                    <TableCell>
+                      <Select
+                        onValueChange={(value) => updateDraft(company.id, "subscriptionPlan", value as SubscriptionPlan)}
+                        value={drafts[company.id]?.subscriptionPlan ?? company.subscriptionPlan}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Plan" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(planLabels).map(([value, label]) => (
+                            <SelectItem key={value} value={value}>
+                              {label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
+                      <Select onValueChange={(value) => updateDraft(company.id, "status", value as CompanyStatus)} value={drafts[company.id]?.status ?? company.status}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(statusLabels).map(([value, label]) => (
+                            <SelectItem key={value} value={value}>
+                              {label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={drafts[company.id]?.timezone ?? company.timezone}
+                        onChange={(event) => updateDraft(company.id, "timezone", event.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {company._count.users} users / {company._count.departments} departments / {company._count.officeLocations} locations
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex justify-end gap-2">
+                        <Button disabled={isPending} onClick={() => void saveCompany(company.id)} type="button" variant="outline">
+                          Save
+                        </Button>
+                        <Button disabled={isPending} onClick={() => void removeCompany(company.id)} size="icon" type="button" variant="destructive">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {!companies.length ? (
+            <div className="rounded-2xl border border-dashed border-border p-4 text-sm text-muted-foreground">
+              No companies have been created yet.
+            </div>
+          ) : null}
         </CardContent>
       </Card>
       <Card>
@@ -303,7 +383,7 @@ export function CompanyManagement({
             </Select>
           </div>
           <LogoUploadField label="Company logo" onChange={(value) => setNewCompany((current) => ({ ...current, logoUrl: value }))} value={newCompany.logoUrl} />
-          <Button disabled={isPending} onClick={() => void create()} type="button">
+          <Button className="w-full sm:w-auto" disabled={isPending} onClick={() => void create()} type="button">
             {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
             Create company
           </Button>

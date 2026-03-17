@@ -94,78 +94,79 @@ export function LocationManagement({ locations }: { locations: LocationRow[] }) 
           <CardTitle>Office locations</CardTitle>
           <CardDescription>Manage geofenced office coordinates and allowed clocking radius for each site.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Coordinates</TableHead>
-                <TableHead>Radius</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {locations.map((location) => (
-                <TableRow key={location.id}>
-                  <TableCell>
+        <CardContent className="space-y-4">
+          <div className="space-y-4 md:hidden">
+            {locations.map((location) => (
+              <div className="rounded-[28px] border border-border bg-secondary/20 p-4" key={location.id}>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Name</Label>
+                    <Input
+                      value={drafts[location.id]?.name ?? location.name}
+                      onChange={(event) =>
+                        setDrafts((current) => ({
+                          ...current,
+                          [location.id]: {
+                            ...current[location.id],
+                            name: event.target.value,
+                          },
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Address</Label>
+                    <Input
+                      placeholder="Address"
+                      value={drafts[location.id]?.address ?? location.address ?? ""}
+                      onChange={(event) =>
+                        setDrafts((current) => ({
+                          ...current,
+                          [location.id]: {
+                            ...current[location.id],
+                            address: event.target.value,
+                          },
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
+                      <Label>Latitude</Label>
                       <Input
-                        value={drafts[location.id]?.name ?? location.name}
+                        type="number"
+                        value={drafts[location.id]?.latitude ?? location.latitude}
                         onChange={(event) =>
                           setDrafts((current) => ({
                             ...current,
                             [location.id]: {
                               ...current[location.id],
-                              name: event.target.value,
-                            },
-                          }))
-                        }
-                      />
-                      <Input
-                        placeholder="Address"
-                        value={drafts[location.id]?.address ?? location.address ?? ""}
-                        onChange={(event) =>
-                          setDrafts((current) => ({
-                            ...current,
-                            [location.id]: {
-                              ...current[location.id],
-                              address: event.target.value,
+                              latitude: Number(event.target.value),
                             },
                           }))
                         }
                       />
                     </div>
-                  </TableCell>
-                  <TableCell className="space-y-2">
-                    <Input
-                      value={drafts[location.id]?.latitude ?? location.latitude}
-                      onChange={(event) =>
-                        setDrafts((current) => ({
-                          ...current,
-                          [location.id]: {
-                            ...current[location.id],
-                            latitude: Number(event.target.value),
-                          },
-                        }))
-                      }
-                    />
-                    <Input
-                      value={drafts[location.id]?.longitude ?? location.longitude}
-                      onChange={(event) =>
-                        setDrafts((current) => ({
-                          ...current,
-                          [location.id]: {
-                            ...current[location.id],
-                            longitude: Number(event.target.value),
-                          },
-                        }))
-                      }
-                    />
-                  </TableCell>
-                  <TableCell>
                     <div className="space-y-2">
+                      <Label>Longitude</Label>
                       <Input
+                        type="number"
+                        value={drafts[location.id]?.longitude ?? location.longitude}
+                        onChange={(event) =>
+                          setDrafts((current) => ({
+                            ...current,
+                            [location.id]: {
+                              ...current[location.id],
+                              longitude: Number(event.target.value),
+                            },
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Radius (meters)</Label>
+                      <Input
+                        type="number"
                         value={drafts[location.id]?.radiusMeters ?? location.radiusMeters}
                         onChange={(event) =>
                           setDrafts((current) => ({
@@ -177,7 +178,11 @@ export function LocationManagement({ locations }: { locations: LocationRow[] }) 
                           }))
                         }
                       />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>QR rotation (minutes)</Label>
                       <Input
+                        type="number"
                         value={drafts[location.id]?.qrRotationMins ?? location.qrRotationMins}
                         onChange={(event) =>
                           setDrafts((current) => ({
@@ -190,35 +195,163 @@ export function LocationManagement({ locations }: { locations: LocationRow[] }) 
                         }
                       />
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Switch
-                        checked={drafts[location.id]?.isActive ?? location.isActive}
-                        onCheckedChange={(checked) =>
+                  </div>
+                  <div className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-background px-4 py-3">
+                    <div>
+                      <p className="text-sm font-medium">Location status</p>
+                      <p className="text-sm text-muted-foreground">{drafts[location.id]?.isActive ? "Active and available for clocking" : "Disabled for clocking"}</p>
+                    </div>
+                    <Switch
+                      checked={drafts[location.id]?.isActive ?? location.isActive}
+                      onCheckedChange={(checked) =>
+                        setDrafts((current) => ({
+                          ...current,
+                          [location.id]: {
+                            ...current[location.id],
+                            isActive: checked,
+                          },
+                        }))
+                      }
+                    />
+                  </div>
+                  <Button className="w-full" disabled={isPending} onClick={() => void saveLocation(location.id)} type="button" variant="outline">
+                    Save location
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Coordinates</TableHead>
+                  <TableHead>Radius</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {locations.map((location) => (
+                  <TableRow key={location.id}>
+                    <TableCell>
+                      <div className="space-y-2">
+                        <Input
+                          value={drafts[location.id]?.name ?? location.name}
+                          onChange={(event) =>
+                            setDrafts((current) => ({
+                              ...current,
+                              [location.id]: {
+                                ...current[location.id],
+                                name: event.target.value,
+                              },
+                            }))
+                          }
+                        />
+                        <Input
+                          placeholder="Address"
+                          value={drafts[location.id]?.address ?? location.address ?? ""}
+                          onChange={(event) =>
+                            setDrafts((current) => ({
+                              ...current,
+                              [location.id]: {
+                                ...current[location.id],
+                                address: event.target.value,
+                              },
+                            }))
+                          }
+                        />
+                      </div>
+                    </TableCell>
+                    <TableCell className="space-y-2">
+                      <Input
+                        type="number"
+                        value={drafts[location.id]?.latitude ?? location.latitude}
+                        onChange={(event) =>
                           setDrafts((current) => ({
                             ...current,
                             [location.id]: {
                               ...current[location.id],
-                              isActive: checked,
+                              latitude: Number(event.target.value),
                             },
                           }))
                         }
                       />
-                      <span>{drafts[location.id]?.isActive ? "Active" : "Disabled"}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex justify-end">
-                      <Button disabled={isPending} onClick={() => void saveLocation(location.id)} type="button" variant="outline">
-                        Save
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                      <Input
+                        type="number"
+                        value={drafts[location.id]?.longitude ?? location.longitude}
+                        onChange={(event) =>
+                          setDrafts((current) => ({
+                            ...current,
+                            [location.id]: {
+                              ...current[location.id],
+                              longitude: Number(event.target.value),
+                            },
+                          }))
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-2">
+                        <Input
+                          type="number"
+                          value={drafts[location.id]?.radiusMeters ?? location.radiusMeters}
+                          onChange={(event) =>
+                            setDrafts((current) => ({
+                              ...current,
+                              [location.id]: {
+                                ...current[location.id],
+                                radiusMeters: Number(event.target.value),
+                              },
+                            }))
+                          }
+                        />
+                        <Input
+                          type="number"
+                          value={drafts[location.id]?.qrRotationMins ?? location.qrRotationMins}
+                          onChange={(event) =>
+                            setDrafts((current) => ({
+                              ...current,
+                              [location.id]: {
+                                ...current[location.id],
+                                qrRotationMins: Number(event.target.value),
+                              },
+                            }))
+                          }
+                        />
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Switch
+                          checked={drafts[location.id]?.isActive ?? location.isActive}
+                          onCheckedChange={(checked) =>
+                            setDrafts((current) => ({
+                              ...current,
+                              [location.id]: {
+                                ...current[location.id],
+                                isActive: checked,
+                              },
+                            }))
+                          }
+                        />
+                        <span>{drafts[location.id]?.isActive ? "Active" : "Disabled"}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex justify-end">
+                        <Button disabled={isPending} onClick={() => void saveLocation(location.id)} type="button" variant="outline">
+                          Save
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
       <Card>
@@ -261,7 +394,7 @@ export function LocationManagement({ locations }: { locations: LocationRow[] }) 
               onChange={(event) => setNewLocation((current) => ({ ...current, radiusMeters: Number(event.target.value) }))}
             />
           </div>
-          <Button disabled={isPending} onClick={() => void createLocation()} type="button">
+          <Button className="w-full sm:w-auto" disabled={isPending} onClick={() => void createLocation()} type="button">
             {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
             Add location
           </Button>

@@ -114,41 +114,81 @@ export function QrCodeManagement({
           <CardTitle>QR access points</CardTitle>
           <CardDescription>Generate rotating QR clock-in codes per office or department.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Label</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Department</TableHead>
-                <TableHead>Rotation</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {codes.map((code) => (
-                <TableRow key={code.id}>
-                  <TableCell>{code.label}</TableCell>
-                  <TableCell>{code.officeLocation.name}</TableCell>
-                  <TableCell>{code.department?.name ?? "All"}</TableCell>
-                  <TableCell>{code.rotationMinutes} min</TableCell>
-                  <TableCell>
-                    <div className="flex justify-end gap-2">
-                      <Button disabled={isPending} onClick={() => void loadPreview(code.id)} type="button" variant="outline">
-                        <QrCode className="mr-2 h-4 w-4" />
-                        Show QR
-                      </Button>
-                      <Button asChild type="button" variant="secondary">
-                        <a href={`/reception?company=${encodeURIComponent(companySlug)}&code=${encodeURIComponent(code.id)}`} rel="noreferrer" target="_blank">
-                          Reception
-                        </a>
-                      </Button>
+        <CardContent className="space-y-4">
+          <div className="space-y-4 md:hidden">
+            {codes.map((code) => (
+              <div className="rounded-[28px] border border-border bg-secondary/20 p-4" key={code.id}>
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-medium">{code.label}</p>
+                      <p className="text-sm text-muted-foreground">{code.officeLocation.name}</p>
                     </div>
-                  </TableCell>
+                    <span className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
+                      {code.rotationMinutes} min
+                    </span>
+                  </div>
+                  <div className="rounded-2xl border border-border bg-background px-4 py-3 text-sm text-muted-foreground">
+                    Department: {code.department?.name ?? "All departments"}
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <Button className="w-full" disabled={isPending} onClick={() => void loadPreview(code.id)} type="button" variant="outline">
+                      <QrCode className="mr-2 h-4 w-4" />
+                      Show live QR
+                    </Button>
+                    <Button asChild className="w-full" type="button" variant="secondary">
+                      <a href={`/reception?company=${encodeURIComponent(companySlug)}&code=${encodeURIComponent(code.id)}`} rel="noreferrer" target="_blank">
+                        Open reception view
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Label</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead>Department</TableHead>
+                  <TableHead>Rotation</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {codes.map((code) => (
+                  <TableRow key={code.id}>
+                    <TableCell>{code.label}</TableCell>
+                    <TableCell>{code.officeLocation.name}</TableCell>
+                    <TableCell>{code.department?.name ?? "All"}</TableCell>
+                    <TableCell>{code.rotationMinutes} min</TableCell>
+                    <TableCell>
+                      <div className="flex justify-end gap-2">
+                        <Button disabled={isPending} onClick={() => void loadPreview(code.id)} type="button" variant="outline">
+                          <QrCode className="mr-2 h-4 w-4" />
+                          Show QR
+                        </Button>
+                        <Button asChild type="button" variant="secondary">
+                          <a href={`/reception?company=${encodeURIComponent(companySlug)}&code=${encodeURIComponent(code.id)}`} rel="noreferrer" target="_blank">
+                            Reception
+                          </a>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {!codes.length ? (
+            <div className="rounded-2xl border border-dashed border-border p-4 text-sm text-muted-foreground">
+              No QR access points have been created yet.
+            </div>
+          ) : null}
         </CardContent>
       </Card>
       <div className="space-y-6">
@@ -201,7 +241,7 @@ export function QrCodeManagement({
                 onChange={(event) => setForm((current) => ({ ...current, rotationMinutes: Number(event.target.value) }))}
               />
             </div>
-            <Button disabled={isPending || !canCreate} onClick={() => void createCode()} type="button">
+            <Button className="w-full sm:w-auto" disabled={isPending || !canCreate} onClick={() => void createCode()} type="button">
               {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <QrCode className="mr-2 h-4 w-4" />}
               Create QR code
             </Button>
@@ -217,7 +257,7 @@ export function QrCodeManagement({
               <>
                 <div className="flex justify-center rounded-[28px] border border-border bg-white p-4">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img alt="QR code preview" className="h-64 w-64" src={preview.image} />
+                  <img alt="QR code preview" className="h-auto w-full max-w-[256px]" src={preview.image} />
                 </div>
                 <p className="text-sm text-muted-foreground">Expires at {new Date(preview.expiresAt).toLocaleTimeString()}</p>
               </>

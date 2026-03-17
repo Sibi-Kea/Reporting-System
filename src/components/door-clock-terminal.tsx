@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getClientDeviceLabel } from "@/lib/device";
 
 export function DoorClockTerminal({
   companyName,
@@ -41,7 +42,7 @@ export function DoorClockTerminal({
         companySlug,
         staffCode: staffCode.trim(),
         qrToken,
-        device: navigator.userAgent,
+        device: getClientDeviceLabel(),
       }),
     });
 

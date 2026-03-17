@@ -55,8 +55,8 @@ function ToggleRow({
   disabled?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between rounded-2xl border border-border bg-secondary/20 px-4 py-3">
-      <div className="pr-4">
+    <div className="flex flex-col gap-4 rounded-2xl border border-border bg-secondary/20 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0 pr-0 sm:pr-4">
         <p className="text-sm font-medium">{title}</p>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
@@ -164,7 +164,7 @@ export function SettingsForm({
       </CardHeader>
       <CardContent className="space-y-6">
         <Tabs defaultValue="general">
-          <TabsList className="h-auto flex-wrap rounded-[26px] bg-secondary/50 p-1">
+          <TabsList className="no-scrollbar w-full flex-nowrap rounded-[26px] bg-secondary/50 p-1">
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="clocking">Clocking</TabsTrigger>
             <TabsTrigger value="verification">Verification</TabsTrigger>
@@ -289,7 +289,7 @@ export function SettingsForm({
               </div>
 
               <div className="rounded-2xl border border-dashed border-border p-4 text-sm text-muted-foreground">
-                Quick clock URL: <span className="font-medium text-foreground">{quickClockUrl}</span>
+                Quick clock URL: <span className="mt-1 block break-all font-medium text-foreground">{quickClockUrl}</span>
               </div>
             </div>
           </TabsContent>
@@ -374,7 +374,7 @@ export function SettingsForm({
 
           <TabsContent value="departments">
             <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-              <div className="rounded-[28px] border border-border bg-secondary/20 p-5">
+              <div className="min-w-0 rounded-[28px] border border-border bg-secondary/20 p-5">
                 <p className="text-sm font-medium">Current departments</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {departments.length ? (
@@ -391,7 +391,7 @@ export function SettingsForm({
               <div className="space-y-3 rounded-[28px] border border-border bg-background p-5">
                 <Label>New department</Label>
                 <Input onChange={(event) => setDepartmentName(event.target.value)} placeholder="Operations" value={departmentName} />
-                <Button onClick={() => void addDepartment()} type="button" variant="outline">
+                <Button className="w-full sm:w-auto" onClick={() => void addDepartment()} type="button" variant="outline">
                   <Plus className="mr-2 h-4 w-4" />
                   Add department
                 </Button>
@@ -400,9 +400,9 @@ export function SettingsForm({
           </TabsContent>
         </Tabs>
 
-        <div className="flex items-center justify-between rounded-[24px] border border-border bg-secondary/20 px-4 py-4">
+        <div className="flex flex-col gap-4 rounded-[24px] border border-border bg-secondary/20 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-muted-foreground">Changes apply across login, quick clock, geofencing, and mobile clocking flows.</p>
-          <Button disabled={isPending} onClick={() => void saveSettings()} type="button">
+          <Button className="w-full sm:w-auto" disabled={isPending} onClick={() => void saveSettings()} type="button">
             {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Save settings
           </Button>

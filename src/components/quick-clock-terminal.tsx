@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useGeolocation } from "@/hooks/use-geolocation";
+import { getClientDeviceLabel } from "@/lib/device";
 import { formatTime, minutesToHoursLabel } from "@/lib/utils";
 
 type QuickClockContext = {
@@ -110,7 +111,7 @@ export function QuickClockTerminal({ defaultCompanySlug = "" }: { defaultCompany
         companySlug: companySlug.trim().toLowerCase(),
         employeeId: employeeId.trim(),
         clockPin: clockPin.trim(),
-        device: navigator.userAgent,
+        device: getClientDeviceLabel(),
         location: nextCoordinates ? `GPS: ${nextCoordinates.latitude.toFixed(4)}, ${nextCoordinates.longitude.toFixed(4)}` : undefined,
         latitude: nextCoordinates?.latitude,
         longitude: nextCoordinates?.longitude,

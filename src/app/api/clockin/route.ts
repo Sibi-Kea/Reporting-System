@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerAuthSession } from "@/lib/auth";
+import { getRequestErrorMessage } from "@/lib/api-error";
 import { clockActionSchema } from "@/lib/validations";
 import { clockIn } from "@/services/attendance-service";
 
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
     return NextResponse.json(attendance);
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Unable to clock in." },
+      { error: getRequestErrorMessage(error, "Unable to clock in.") },
       { status: 400 },
     );
   }

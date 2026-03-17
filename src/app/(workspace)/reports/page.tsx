@@ -65,14 +65,14 @@ export default async function ReportsPage({
       />
 
       <form className="grid gap-4 rounded-[28px] border border-border bg-card p-4 md:grid-cols-[180px_180px_220px_auto]">
-        <select className="h-11 rounded-2xl border border-input bg-background px-4 text-sm" defaultValue={String(month)} name="month">
+        <select className="h-11 rounded-2xl border border-input bg-background px-4 text-base sm:text-sm" defaultValue={String(month)} name="month">
           {Array.from({ length: 12 }, (_, index) => (
             <option key={index + 1} value={index + 1}>
               {format(startOfMonth(new Date(year, index, 1)), "MMMM")}
             </option>
           ))}
         </select>
-        <select className="h-11 rounded-2xl border border-input bg-background px-4 text-sm" defaultValue={String(year)} name="year">
+        <select className="h-11 rounded-2xl border border-input bg-background px-4 text-base sm:text-sm" defaultValue={String(year)} name="year">
           {Array.from({ length: 5 }, (_, index) => {
             const currentYear = today.getFullYear() - index;
             return (
@@ -82,7 +82,7 @@ export default async function ReportsPage({
             );
           })}
         </select>
-        <select className="h-11 rounded-2xl border border-input bg-background px-4 text-sm" defaultValue={searchParams?.departmentId ?? ""} name="departmentId">
+        <select className="h-11 rounded-2xl border border-input bg-background px-4 text-base sm:text-sm" defaultValue={searchParams?.departmentId ?? ""} name="departmentId">
           <option value="">All departments</option>
           {departments.map((department) => (
             <option key={department.id} value={department.id}>
@@ -107,39 +107,76 @@ export default async function ReportsPage({
         />
       </div>
 
-      <div className="surface-card overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Employee</TableHead>
-              <TableHead>Department</TableHead>
-              <TableHead>Total Hours</TableHead>
-              <TableHead>Overtime</TableHead>
-              <TableHead>Late Days</TableHead>
-              <TableHead>Absences</TableHead>
-              <TableHead>Clock In Times</TableHead>
-              <TableHead>Clock Out Times</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {report.rows.map((row) => (
-              <TableRow key={`${row.employeeName}-${row.department}`}>
-                <TableCell className="font-medium">{row.employeeName}</TableCell>
-                <TableCell>{row.department}</TableCell>
-                <TableCell>{row.totalHours}</TableCell>
-                <TableCell>{row.overtimeHours}</TableCell>
-                <TableCell>
-                  <Badge variant={row.lateDays > 0 ? "warning" : "success"}>{row.lateDays}</Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={row.absences > 0 ? "destructive" : "success"}>{row.absences}</Badge>
-                </TableCell>
-                <TableCell className="max-w-[280px] text-xs text-muted-foreground">{row.clockInTimes || "--"}</TableCell>
-                <TableCell className="max-w-[280px] text-xs text-muted-foreground">{row.clockOutTimes || "--"}</TableCell>
+      <div className="surface-card overflow-hidden p-4 md:p-0">
+        <div className="space-y-4 md:hidden">
+          {report.rows.map((row) => (
+            <div className="rounded-[24px] border border-border bg-secondary/20 p-4" key={`${row.employeeName}-${row.department}`}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-medium">{row.employeeName}</p>
+                  <p className="text-sm text-muted-foreground">{row.department}</p>
+                </div>
+                <div className="flex gap-2">
+                  <Badge variant={row.lateDays > 0 ? "warning" : "success"}>{row.lateDays} late</Badge>
+                  <Badge variant={row.absences > 0 ? "destructive" : "success"}>{row.absences} absent</Badge>
+                </div>
+              </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Total hours</p>
+                  <p className="mt-1 text-sm font-medium">{row.totalHours}</p>
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Overtime</p>
+                  <p className="mt-1 text-sm font-medium">{row.overtimeHours}</p>
+                </div>
+                <div className="sm:col-span-2">
+                  <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Clock in times</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{row.clockInTimes || "--"}</p>
+                </div>
+                <div className="sm:col-span-2">
+                  <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Clock out times</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{row.clockOutTimes || "--"}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="hidden md:block">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Employee</TableHead>
+                <TableHead>Department</TableHead>
+                <TableHead>Total Hours</TableHead>
+                <TableHead>Overtime</TableHead>
+                <TableHead>Late Days</TableHead>
+                <TableHead>Absences</TableHead>
+                <TableHead>Clock In Times</TableHead>
+                <TableHead>Clock Out Times</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {report.rows.map((row) => (
+                <TableRow key={`${row.employeeName}-${row.department}`}>
+                  <TableCell className="font-medium">{row.employeeName}</TableCell>
+                  <TableCell>{row.department}</TableCell>
+                  <TableCell>{row.totalHours}</TableCell>
+                  <TableCell>{row.overtimeHours}</TableCell>
+                  <TableCell>
+                    <Badge variant={row.lateDays > 0 ? "warning" : "success"}>{row.lateDays}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={row.absences > 0 ? "destructive" : "success"}>{row.absences}</Badge>
+                  </TableCell>
+                  <TableCell className="max-w-[280px] text-xs text-muted-foreground">{row.clockInTimes || "--"}</TableCell>
+                  <TableCell className="max-w-[280px] text-xs text-muted-foreground">{row.clockOutTimes || "--"}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );

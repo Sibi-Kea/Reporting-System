@@ -48,15 +48,15 @@ export function LogoUploadField({
   return (
     <div className="space-y-3">
       <Label>{label}</Label>
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         {value ? (
-          <img alt="Company logo preview" className="h-16 w-16 rounded-2xl object-cover" src={value} />
+          <img alt="Company logo preview" className="h-14 w-14 rounded-2xl object-cover sm:h-16 sm:w-16" src={value} />
         ) : (
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-dashed border-border bg-secondary/30 text-muted-foreground">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-dashed border-border bg-secondary/30 text-muted-foreground sm:h-16 sm:w-16">
             <ImagePlus className="h-5 w-5" />
           </div>
         )}
-        <div className="flex-1 space-y-3">
+        <div className="w-full flex-1 space-y-3">
           <Input
             accept="image/png,image/jpeg,image/webp,image/svg+xml"
             disabled={isUploading}
@@ -69,7 +69,7 @@ export function LogoUploadField({
             }}
             type="file"
           />
-          <Button disabled={isUploading || !value} onClick={() => onChange("")} type="button" variant="outline">
+          <Button className="w-full sm:w-auto" disabled={isUploading || !value} onClick={() => onChange("")} type="button" variant="outline">
             {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Remove logo
           </Button>

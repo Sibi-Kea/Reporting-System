@@ -1,5 +1,8 @@
 import { CompanyStatus, GpsEnforcementMode, Role, SubscriptionPlan } from "@prisma/client";
 import { z } from "zod";
+import { normalizeDeviceLabel } from "@/lib/device";
+
+const deviceSchema = z.string().min(2).max(4096).transform(normalizeDeviceLabel);
 
 export const adminSignInSchema = z.object({
   companySlug: z
@@ -21,7 +24,7 @@ export const staffPortalSignInSchema = z.object({
 });
 
 export const clockActionSchema = z.object({
-  device: z.string().min(2).max(120),
+  device: deviceSchema,
   location: z.string().max(180).optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
@@ -114,7 +117,7 @@ export const quickClockIdentitySchema = z.object({
 });
 
 export const quickClockActionSchema = quickClockIdentitySchema.extend({
-  device: z.string().min(2).max(120),
+  device: deviceSchema,
   location: z.string().max(180).optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
@@ -138,7 +141,7 @@ export const receptionDoorClockSchema = z.object({
     .regex(/^[a-z0-9-]+$/),
   staffCode: z.string().regex(/^\d{4,8}$/),
   qrToken: z.string().min(8).max(512),
-  device: z.string().min(2).max(120),
+  device: deviceSchema,
 });
 
 export const officeLocationSchema = z.object({

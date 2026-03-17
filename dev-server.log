@@ -20,3 +20,24 @@
  ✓ Compiled in 1372ms (436 modules)
  GET /login 200 in 6245ms
  ✓ Compiled in 900ms (436 modules)
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+ ✓ Compiled in 1238ms (436 modules)
+ ✓ Compiled in 945ms (436 modules)
+ ✓ Compiled in 522ms (436 modules)
+ ✓ Compiled in 587ms (436 modules)
+ ✓ Compiled in 870ms (436 modules)
+ ✓ Compiled in 1573ms (436 modules)
+ ✓ Compiled in 2.2s (436 modules)
+ ○ Compiling /login ...
+ ✓ Compiled /login in 2.3s (792 modules)
+ GET /login 200 in 7352ms
+ ✓ Compiled in 5.5s (436 modules)
+ ✓ Compiled in 2.3s (436 modules)
+ ✓ Compiled in 1050ms (436 modules)
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+ ✓ Compiled in 512ms (436 modules)
+ ✓ Compiled in 481ms (436 modules)
+ ✓ Compiled in 910ms (436 modules)
+ ✓ Compiled in 964ms (436 modules)
+
+C:\Users\CRC_Dev\Desktop\SM Techie\Reporting-System>

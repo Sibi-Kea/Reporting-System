@@ -51,7 +51,7 @@ export default async function SettingsPage() {
       </div>
 
       <Tabs defaultValue="workspace">
-        <TabsList className="h-auto flex-wrap rounded-[28px] bg-secondary/50 p-1">
+        <TabsList className="no-scrollbar w-full flex-nowrap rounded-[28px] bg-secondary/50 p-1">
           <TabsTrigger value="workspace">Workspace</TabsTrigger>
           <TabsTrigger value="verification">Verification</TabsTrigger>
           <TabsTrigger value="schedules">Schedules</TabsTrigger>
@@ -117,9 +117,9 @@ export default async function SettingsPage() {
                     <div className="rounded-2xl border border-dashed border-border p-4 text-sm text-muted-foreground">
                       The door QR rotates automatically and the reception screen switches into clock-out mode when the configured clock-out window starts.
                     </div>
-                    <div className="flex flex-wrap gap-3">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                       {primaryQrCode ? (
-                        <Button asChild>
+                        <Button asChild className="w-full sm:w-auto">
                           <a href={receptionPath} rel="noreferrer" target="_blank">
                             Open reception dashboard
                           </a>
@@ -168,7 +168,7 @@ export default async function SettingsPage() {
             <CardContent className="space-y-4">
               {workspace.shifts.map((shift) => (
                 <div key={shift.id} className="rounded-2xl border border-border bg-secondary/20 p-4">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <p className="font-medium">{shift.name}</p>
                       <p className="text-sm text-muted-foreground">
@@ -195,27 +195,50 @@ export default async function SettingsPage() {
               <CardTitle>Recent audit activity</CardTitle>
               <CardDescription>Latest operational changes and tracked user actions across the workspace.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Action</TableHead>
-                    <TableHead>Entity</TableHead>
-                    <TableHead>User</TableHead>
-                    <TableHead>Timestamp</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {workspace.auditLogs.map((log) => (
-                    <TableRow key={log.id}>
-                      <TableCell>{log.action.replace("_", " ")}</TableCell>
-                      <TableCell>{log.entity}</TableCell>
-                      <TableCell>{log.user?.name ?? "System"}</TableCell>
-                      <TableCell>{format(log.createdAt, "dd MMM yyyy HH:mm")}</TableCell>
+            <CardContent className="space-y-4">
+              <div className="space-y-3 md:hidden">
+                {workspace.auditLogs.map((log) => (
+                  <div className="rounded-2xl border border-border bg-secondary/20 p-4" key={log.id}>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-medium">{log.action.replace("_", " ")}</p>
+                        <p className="text-sm text-muted-foreground">{log.entity}</p>
+                      </div>
+                      <Badge variant="outline">{log.user?.name ?? "System"}</Badge>
+                    </div>
+                    <p className="mt-3 text-sm text-muted-foreground">{format(log.createdAt, "dd MMM yyyy HH:mm")}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Action</TableHead>
+                      <TableHead>Entity</TableHead>
+                      <TableHead>User</TableHead>
+                      <TableHead>Timestamp</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {workspace.auditLogs.map((log) => (
+                      <TableRow key={log.id}>
+                        <TableCell>{log.action.replace("_", " ")}</TableCell>
+                        <TableCell>{log.entity}</TableCell>
+                        <TableCell>{log.user?.name ?? "System"}</TableCell>
+                        <TableCell>{format(log.createdAt, "dd MMM yyyy HH:mm")}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {!workspace.auditLogs.length ? (
+                <div className="rounded-2xl border border-dashed border-border p-4 text-sm text-muted-foreground">
+                  No audit activity has been captured yet.
+                </div>
+              ) : null}
             </CardContent>
           </Card>
         </TabsContent>

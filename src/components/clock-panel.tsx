@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useOfflineClock } from "@/hooks/use-offline-clock";
+import { getClientDeviceLabel } from "@/lib/device";
 import { formatTime, minutesToHoursLabel } from "@/lib/utils";
 
 type ClockRecord = {
@@ -196,7 +197,7 @@ export function ClockPanel({
     }
 
     const payload = {
-      device: navigator.userAgent,
+      device: getClientDeviceLabel(),
       location: nextCoordinates ? `GPS: ${nextCoordinates.latitude.toFixed(4)}, ${nextCoordinates.longitude.toFixed(4)}` : undefined,
       latitude: nextCoordinates?.latitude,
       longitude: nextCoordinates?.longitude,
