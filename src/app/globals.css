@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 216 33% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  --primary: 221 83% 53%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222 47% 11%;
+  --muted: 214 32% 93%;
+  --muted-foreground: 215 16% 47%;
+  --accent: 191 91% 36%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214 32% 88%;
+  --input: 214 32% 88%;
+  --ring: 221 83% 53%;
+  --radius: 1.2rem;
+  --chart-1: 221 83% 53%;
+  --chart-2: 191 91% 36%;
+  --chart-3: 25 95% 53%;
+  --chart-4: 148 63% 42%;
+  --chart-5: 345 82% 61%;
+}
+
+.dark {
+  --background: 224 34% 8%;
+  --foreground: 210 40% 96%;
+  --card: 224 32% 12%;
+  --card-foreground: 210 40% 96%;
+  --popover: 224 32% 12%;
+  --popover-foreground: 210 40% 96%;
+  --primary: 214 95% 68%;
+  --primary-foreground: 222 47% 11%;
+  --secondary: 223 25% 18%;
+  --secondary-foreground: 210 40% 96%;
+  --muted: 223 23% 16%;
+  --muted-foreground: 214 20% 71%;
+  --accent: 191 85% 46%;
+  --accent-foreground: 222 47% 11%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 223 18% 22%;
+  --input: 223 18% 22%;
+  --ring: 214 95% 68%;
+  --chart-1: 214 95% 68%;
+  --chart-2: 191 85% 46%;
+  --chart-3: 25 95% 58%;
+  --chart-4: 148 63% 52%;
+  --chart-5: 345 82% 70%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply min-h-screen bg-background font-sans text-foreground antialiased;
+    background-image:
+      radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 28%),
+      radial-gradient(circle at top right, rgba(14, 165, 233, 0.12), transparent 24%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(248, 250, 252, 0.9));
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 28%),
+      radial-gradient(circle at top right, rgba(14, 165, 233, 0.12), transparent 24%),
+      linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(2, 6, 23, 0.98));
+  }
+}
+
+@layer components {
+  .surface-card {
+    @apply rounded-[28px] border border-white/60 bg-card/90 shadow-soft backdrop-blur-xl dark:border-white/5 dark:bg-card/90;
+  }
+
+  .surface-muted {
+    @apply rounded-2xl border bg-secondary/50;
+  }
+
+  .grid-pattern {
+    background-image:
+      linear-gradient(to right, rgba(148, 163, 184, 0.12) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

@@ -1,0 +1,354 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  EMPLOYEE
+  MANAGER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum AttendanceStatus {
+  CLOCKED_IN
+  COMPLETED
+  LATE
+  ABSENT
+  ON_LEAVE
+}
+
+enum ShiftType {
+  DAY
+  EVENING
+  NIGHT
+  FLEX
+}
+
+enum NotificationType {
+  SHIFT_REMINDER
+  LATE_WARNING
+  CLOCK_OUT_REMINDER
+  SYSTEM
+}
+
+enum AuditAction {
+  LOGIN
+  CLOCK_IN
+  CLOCK_OUT
+  CREATE
+  UPDATE
+  DELETE
+  APPROVE
+  EXPORT
+  SETTINGS_UPDATE
+}
+
+enum SubscriptionPlan {
+  STARTER
+  GROWTH
+  PREMIUM
+}
+
+enum CompanyStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum GpsEnforcementMode {
+  BLOCK
+  MARK_REMOTE
+}
+
+enum VerificationMethod {
+  STANDARD
+  FACE
+  QR
+}
+
+model Company {
+  id                  String             @id @default(cuid())
+  name                String
+  slug                String             @unique
+  logoUrl             String?
+  publicLoginDefault  Boolean            @default(false)
+  timezone            String             @default("Africa/Johannesburg")
+  subscriptionPlan    SubscriptionPlan   @default(STARTER)
+  status              CompanyStatus      @default(ACTIVE)
+  suspendedAt         DateTime?
+  gpsEnforced         Boolean            @default(false)
+  allowRemoteClocking Boolean            @default(true)
+  ipAllowlist         String[]
+  clockingRules       Json?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  departments         Department[]
+  users               User[]
+  shifts              Shift[]
+  officeLocations     OfficeLocation[]
+  qrClockCodes        QrClockCode[]
+  biometricProfiles   BiometricProfile[]
+  attendances         Attendance[]
+  reports             Report[]
+  settings            SystemSetting?
+  auditLogs           AuditLog[]
+  notifications       Notification[]
+}
+
+model Department {
+  id           String        @id @default(cuid())
+  companyId    String
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name         String
+  description  String?
+  users        User[]        @relation("DepartmentUsers")
+  reports      Report[]
+  qrClockCodes QrClockCode[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@unique([companyId, name])
+}
+
+model Shift {
+  id                   String       @id @default(cuid())
+  companyId            String
+  company              Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name                 String
+  type                 ShiftType    @default(DAY)
+  startTime            String
+  endTime              String
+  lateAfter            String
+  overtimeAfterMinutes Int          @default(480)
+  workDays             Int[]
+  users                User[]
+  attendances          Attendance[]
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+}
+
+model OfficeLocation {
+  id             String        @id @default(cuid())
+  companyId      String
+  company        Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name           String
+  address        String?
+  latitude       Float
+  longitude      Float
+  radiusMeters   Int           @default(100)
+  isActive       Boolean       @default(true)
+  qrRotationMins Int           @default(5)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  attendances    Attendance[]
+  qrClockCodes   QrClockCode[]
+
+  @@index([companyId, isActive])
+}
+
+model QrClockCode {
+  id               String         @id @default(cuid())
+  companyId        String
+  company          Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  officeLocationId String
+  officeLocation   OfficeLocation @relation(fields: [officeLocationId], references: [id], onDelete: Cascade)
+  departmentId     String?
+  department       Department?    @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  label            String
+  rotationMinutes  Int            @default(5)
+  currentTokenHash String         @unique
+  lastIssuedAt     DateTime       @default(now())
+  expiresAt        DateTime
+  isActive         Boolean        @default(true)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  attendances      Attendance[]
+
+  @@index([companyId, isActive])
+}
+
+model BiometricProfile {
+  id                String    @id @default(cuid())
+  companyId         String
+  company           Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  encryptedTemplate String    @db.Text
+  algorithm         String    @default("normalized-landmark-vector:v1")
+  livenessMode      String    @default("blink-turn")
+  enrolledAt        DateTime  @default(now())
+  lastVerifiedAt    DateTime?
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([companyId, isActive])
+}
+
+model User {
+  id                  String            @id @default(cuid())
+  companyId           String
+  company             Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  departmentId        String?
+  department          Department?       @relation("DepartmentUsers", fields: [departmentId], references: [id], onDelete: SetNull)
+  managerId           String?
+  manager             User?             @relation("ManagerToReports", fields: [managerId], references: [id], onDelete: SetNull)
+  directReports       User[]            @relation("ManagerToReports")
+  shiftId             String?
+  shift               Shift?            @relation(fields: [shiftId], references: [id], onDelete: SetNull)
+  name                String
+  email               String
+  password            String
+  employeeId          String
+  clockPinHash        String?
+  staffCodeLookup     String?           @db.VarChar(64)
+  avatarUrl           String?
+  position            String?
+  phone               String?
+  role                Role              @default(EMPLOYEE)
+  isActive            Boolean           @default(true)
+  lastLoginAt         DateTime?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  biometricProfile    BiometricProfile?
+  attendance          Attendance[]
+  approvedAttendances Attendance[]      @relation("AttendanceApprovals")
+  generatedReports    Report[]          @relation("GeneratedReports")
+  auditLogs           AuditLog[]        @relation("UserAuditLogs")
+  notifications       Notification[]
+  settingsUpdates     SystemSetting[]   @relation("SettingsUpdater")
+
+  @@unique([companyId, employeeId])
+  @@unique([companyId, email])
+  @@unique([companyId, staffCodeLookup])
+  @@index([companyId, role])
+}
+
+model Attendance {
+  id                 String             @id @default(cuid())
+  companyId          String
+  company            Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  userId             String
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shiftId            String?
+  shift              Shift?             @relation(fields: [shiftId], references: [id], onDelete: SetNull)
+  officeLocationId   String?
+  officeLocation     OfficeLocation?    @relation(fields: [officeLocationId], references: [id], onDelete: SetNull)
+  qrClockCodeId      String?
+  qrClockCode        QrClockCode?       @relation(fields: [qrClockCodeId], references: [id], onDelete: SetNull)
+  approvedById       String?
+  approvedBy         User?              @relation("AttendanceApprovals", fields: [approvedById], references: [id], onDelete: SetNull)
+  date               DateTime
+  clockIn            DateTime?
+  clockOut           DateTime?
+  totalMinutes       Int                @default(0)
+  overtimeMinutes    Int                @default(0)
+  lateMinutes        Int                @default(0)
+  earlyLeaveMinutes  Int                @default(0)
+  status             AttendanceStatus   @default(CLOCKED_IN)
+  verificationMethod VerificationMethod @default(STANDARD)
+  device             String?
+  location           String?
+  latitude           Float?
+  longitude          Float?
+  withinGeofence     Boolean?
+  remoteClocking     Boolean            @default(false)
+  biometricVerified  Boolean            @default(false)
+  livenessPassed     Boolean            @default(false)
+  faceMatchScore     Float?
+  qrVerified         Boolean            @default(false)
+  shiftType          ShiftType          @default(DAY)
+  notes              String?
+  approvedAt         DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@unique([userId, date])
+  @@index([companyId, date])
+  @@index([companyId, status])
+}
+
+model Report {
+  id            String      @id @default(cuid())
+  companyId     String
+  company       Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  departmentId  String?
+  department    Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  generatedById String
+  generatedBy   User        @relation("GeneratedReports", fields: [generatedById], references: [id], onDelete: Cascade)
+  month         Int
+  year          Int
+  filters       Json?
+  fileUrl       String?
+  generatedAt   DateTime    @default(now())
+  createdAt     DateTime    @default(now())
+
+  @@index([companyId, year, month])
+}
+
+model SystemSetting {
+  id                      String             @id @default(cuid())
+  companyId               String             @unique
+  company                 Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  defaultTimezone         String             @default("Africa/Johannesburg")
+  quickClockEnabled       Boolean            @default(false)
+  quickClockRequirePin    Boolean            @default(true)
+  gpsEnforced             Boolean            @default(false)
+  gpsEnforcementMode      GpsEnforcementMode @default(MARK_REMOTE)
+  allowRemoteClocking     Boolean            @default(true)
+  qrClockingEnabled       Boolean            @default(false)
+  qrRotationMinutes       Int                @default(5)
+  faceClockingEnabled     Boolean            @default(false)
+  faceMatchThreshold      Float              @default(0.92)
+  enforceClockWindows     Boolean            @default(false)
+  clockInWindowStart      String             @default("06:00")
+  clockInWindowEnd        String             @default("11:00")
+  clockOutWindowStart     String             @default("15:00")
+  clockOutWindowEnd       String             @default("23:30")
+  lateThresholdMinutes    Int                @default(10)
+  overtimeAfterMinutes    Int                @default(480)
+  shiftReminderMinutes    Int                @default(30)
+  clockOutReminderMinutes Int                @default(30)
+  clockInGraceMinutes     Int                @default(10)
+  updatedById             String?
+  updatedBy               User?              @relation("SettingsUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+  ipAllowlist             String[]
+  notificationPreferences Json?
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+}
+
+model AuditLog {
+  id        String      @id @default(cuid())
+  companyId String
+  company   Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?       @relation("UserAuditLogs", fields: [userId], references: [id], onDelete: SetNull)
+  action    AuditAction
+  entity    String
+  entityId  String?
+  metadata  Json?
+  createdAt DateTime    @default(now())
+
+  @@index([companyId, createdAt])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  companyId String
+  company   Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  body      String
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  @@index([companyId, createdAt])
+}
